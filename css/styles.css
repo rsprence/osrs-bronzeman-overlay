@@ -606,10 +606,6 @@ body {
   animation: unlock-rise 0.5s ease-out 0.58s both;
 }
 
-.unlock-celebration.is-active .unlock-celebration__tagline {
-  animation: unlock-rise 0.5s ease-out 0.7s both;
-}
-
 /* Exit */
 .unlock-celebration.is-leaving .unlock-celebration__backdrop,
 .unlock-celebration.is-leaving .unlock-celebration__vignette,
