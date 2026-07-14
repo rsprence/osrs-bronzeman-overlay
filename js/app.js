@@ -1,20 +1,36 @@
-import { ITEMS } from "../data/items.js";
+import { ITEMS, CELEBRATION_KEY } from "../data/items.js";
 import { formatGp, wikiThumb } from "./format.js";
-import { loadUnlocks, saveUnlocks, toggleUnlock, resetUnlocks, summarize } from "./storage.js";
+import {
+  loadUnlocks,
+  saveUnlocks,
+  toggleUnlock,
+  resetUnlocks,
+  summarize,
+  readCelebration,
+  CHANNEL_NAME,
+} from "./storage.js";
+import { createCelebrationController } from "./celebration.js";
 
 const view = new URLSearchParams(window.location.search).get("view") || "overlay";
 const isControl = view === "control";
+const isCelebration = view === "celebration";
 
 const overlayView = document.getElementById("overlay-view");
 const controlView = document.getElementById("control-view");
+const celebrationView = document.getElementById("celebration-view");
 const overlayGrid = document.getElementById("overlay-grid");
 const controlGrid = document.getElementById("control-grid");
 const overlaySummary = document.getElementById("overlay-summary");
 const controlSummary = document.getElementById("control-summary");
 
 const cardById = new Map();
+const itemById = new Map(ITEMS.map((item) => [item.id, item]));
 let lastUnlocksJson = "";
 let lastStatsKey = "";
+let lastCelebrationAt = 0;
+let prevUnlocks = null;
+let celebration = null;
+let channel = null;
 
 const FALLBACK_ICON = `data:image/svg+xml,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><rect fill="#2b1f0e" width="28" height="28"/><text x="14" y="18" fill="#ff981f" font-size="14" text-anchor="middle" font-family="monospace">?</text></svg>'
@@ -112,7 +128,37 @@ function buildGrid(container, interactive) {
   }
 }
 
-function syncFromStorage() {
+function triggerCelebration(itemId, at = Date.now()) {
+  if (!celebration || !itemId) return;
+  if (at <= lastCelebrationAt) return;
+  const item = itemById.get(itemId);
+  if (!item) return;
+  lastCelebrationAt = at;
+  celebration.play(item);
+}
+
+function maybeCelebrateFromStorage() {
+  const event = readCelebration();
+  if (!event) return;
+  triggerCelebration(event.id, event.at);
+}
+
+/** Detect locked→unlocked transitions (backup if celebration key is missed). */
+function maybeCelebrateFromUnlockDiff(unlocks) {
+  if (!celebration || !prevUnlocks) {
+    prevUnlocks = { ...unlocks };
+    return;
+  }
+  for (const item of ITEMS) {
+    if (unlocks[item.id] && !prevUnlocks[item.id]) {
+      triggerCelebration(item.id, Date.now());
+      break;
+    }
+  }
+  prevUnlocks = { ...unlocks };
+}
+
+function syncBoardFromStorage() {
   const unlocks = loadUnlocks();
   const unlocksJson = JSON.stringify(unlocks);
   const stats = summarize(unlocks);
@@ -132,7 +178,53 @@ function syncFromStorage() {
   }
 }
 
-function init() {
+function syncCelebrationFromStorage() {
+  const unlocks = loadUnlocks();
+  maybeCelebrateFromUnlockDiff(unlocks);
+  maybeCelebrateFromStorage();
+}
+
+function syncFromStorage() {
+  if (isCelebration) {
+    syncCelebrationFromStorage();
+    return;
+  }
+  syncBoardFromStorage();
+}
+
+function initCelebrationView() {
+  celebrationView.classList.remove("hidden");
+  celebration = createCelebrationController(
+    document.getElementById("unlock-celebration")
+  );
+
+  // Ignore leftover events from earlier sessions on load.
+  const existing = readCelebration();
+  if (existing) lastCelebrationAt = existing.at;
+  prevUnlocks = loadUnlocks();
+
+  window.addEventListener("storage", (e) => {
+    if (e.key === CELEBRATION_KEY || e.key?.includes("osrs-bronzeman-unlocks")) {
+      syncCelebrationFromStorage();
+    }
+  });
+
+  try {
+    channel = new BroadcastChannel(CHANNEL_NAME);
+    channel.addEventListener("message", (e) => {
+      if (e.data?.type === "celebration" && e.data.id) {
+        triggerCelebration(e.data.id, e.data.at || Date.now());
+      }
+    });
+  } catch {
+    channel = null;
+  }
+
+  // OBS CEF often misses storage events — poll aggressively.
+  setInterval(syncCelebrationFromStorage, 250);
+}
+
+function initBoardView() {
   const grid = isControl ? controlGrid : overlayGrid;
 
   if (isControl) {
@@ -159,8 +251,15 @@ function init() {
     if (e.key?.includes("osrs-bronzeman-unlocks")) syncFromStorage();
   });
 
-  // Poll for OBS browser-source sync; only updates DOM when state actually changes.
   setInterval(syncFromStorage, 2000);
+}
+
+function init() {
+  if (isCelebration) {
+    initCelebrationView();
+    return;
+  }
+  initBoardView();
 }
 
 init();

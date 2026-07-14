@@ -19,18 +19,19 @@ OBS browser overlay for **Bronzeman mode** partner unlock tracking. Shows item s
 
 2. **Add OBS Browser Sources:**
 
-   | Source | URL |
-   |--------|-----|
-   | Overlay (on stream) | `http://localhost:3000/?view=overlay` |
-   | Control (off-stream) | `http://localhost:3000/?view=control` |
+   | Source | URL | Notes |
+   |--------|-----|-------|
+   | Progress overlay | `http://localhost:3000/?view=overlay` | Unlock board HUD |
+   | Celebration overlay | `http://localhost:3000/?view=celebration` | Transparent until unlock; full-screen takeover |
+   | Control (off-stream) | `http://localhost:3000/?view=control` | Toggle unlocks |
 
-   Adjust port if using Python (`8080`).
+   Adjust port if using Python (`8080`). Put the celebration source **above** the game capture so it can cover the whole canvas.
 
-3. **OBS settings for the overlay source:**
-   - Width: **1920**, Height: **1080** (full canvas — all items visible, no scroll)
+3. **OBS settings for both overlay sources:**
+   - Width: **1920**, Height: **1080** (full canvas)
    - Background: transparent (default)
 
-4. **Toggle unlocks** on the control page while you play. The overlay updates automatically.
+4. **Toggle unlocks** on the control page while you play. The progress overlay updates automatically. Unlocking an item fires the celebration overlay (hero item, flash, particles), then it goes transparent again.
 
 ## Unlock rules
 
@@ -82,7 +83,8 @@ Edit `data/items.js` to change names, costs, or wiki image names. Item sprites l
 After pushing to GitHub, enable **Pages** under repo Settings → Pages → Source: **GitHub Actions**.
 
 Your live URLs will be:
-- Overlay: `https://<username>.github.io/osrs-bronzeman-overlay/?view=overlay`
+- Progress: `https://<username>.github.io/osrs-bronzeman-overlay/?view=overlay`
+- Celebration: `https://<username>.github.io/osrs-bronzeman-overlay/?view=celebration`
 - Control: `https://<username>.github.io/osrs-bronzeman-overlay/?view=control`
 
-Use these in OBS instead of `localhost` — no local server needed.
+Use these in OBS instead of `localhost` — no local server needed. Put celebration above game capture.

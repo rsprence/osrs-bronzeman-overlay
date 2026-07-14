@@ -7,13 +7,35 @@
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
-    <!-- OBS Browser Source: index.html?view=overlay -->
+    <!-- OBS Browser Source: progress board -->
     <div id="overlay-view" class="hidden">
       <div class="osrs-panel">
         <h1 class="osrs-title">Bronzeman Unlocks</h1>
 
         <div class="summary-bar" id="overlay-summary"></div>
         <div class="item-grid overlay-grid" id="overlay-grid"></div>
+      </div>
+    </div>
+
+    <!-- OBS Browser Source: unlock celebration only (transparent until unlock) -->
+    <div id="celebration-view" class="hidden">
+      <div id="unlock-celebration" class="unlock-celebration hidden" aria-hidden="true">
+        <div class="unlock-celebration__backdrop"></div>
+        <div class="unlock-celebration__vignette"></div>
+        <div class="unlock-celebration__rays" aria-hidden="true"></div>
+        <div class="unlock-celebration__scanlines" aria-hidden="true"></div>
+        <canvas class="unlock-celebration__particles" width="1920" height="1080"></canvas>
+        <div class="unlock-celebration__flash"></div>
+        <div class="unlock-celebration__content">
+          <div class="unlock-celebration__ring"></div>
+          <div class="unlock-celebration__icon-wrap">
+            <img class="unlock-celebration__icon" alt="" width="128" height="128" />
+          </div>
+          <p class="unlock-celebration__banner">UNLOCKED</p>
+          <h2 class="unlock-celebration__name"></h2>
+          <p class="unlock-celebration__cost"></p>
+          <p class="unlock-celebration__tagline">Bronzeman Progress</p>
+        </div>
       </div>
     </div>
 
@@ -33,8 +55,9 @@
         <div class="item-grid control-grid" id="control-grid"></div>
 
         <p class="control-hint">
-          Overlay URL: <strong>index.html?view=overlay</strong><br />
-          Run a local server so OBS and this page share state.
+          Progress overlay: <strong>/?view=overlay</strong><br />
+          Celebration overlay: <strong>/?view=celebration</strong><br />
+          Control + both OBS sources must share the same origin (same server URL).
         </p>
       </div>
     </div>
