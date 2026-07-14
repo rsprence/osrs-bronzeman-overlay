@@ -61,16 +61,30 @@ Edit `data/items.js` to change names, costs, or wiki image names. Item sprites l
 
 ## Move to Cursor Cloud
 
-1. **Push this repo to GitHub** (Git is not installed on this machine yet — install [Git for Windows](https://git-scm.com/download/win), then):
-   ```powershell
-   cd C:\Users\Prence\Projects\osrs-bronzeman-overlay
-   git init
-   git add .
-   git commit -m "OSRS Bronzeman unlock overlay"
-   gh repo create osrs-bronzeman-overlay --public --source=. --push
-   ```
+1. **Push this repo to GitHub** — use either method below.
 2. **Connect the repo** in [Cursor Cloud Agents → Environments](https://cursor.com/dashboard/cloud-agents#environments).
 3. In this chat, click **Move to Cloud** or type `/cloud` to continue work on a cloud VM.
+
+### Option A — GitHub website (no `gh` CLI needed)
+
+1. Create a new empty repo at [github.com/new](https://github.com/new) named `osrs-bronzeman-overlay` (public, **no** README/license).
+2. Run these commands in PowerShell (use full path if `git` isn't recognized):
+
+```powershell
+cd C:\Users\Prence\Projects\osrs-bronzeman-overlay
+& "C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/YOUR_USERNAME/osrs-bronzeman-overlay.git
+& "C:\Program Files\Git\bin\git.exe" push -u origin main
+```
+
+Replace `YOUR_USERNAME` with your GitHub username. Sign in when the browser/auth prompt appears.
+
+### Option B — Install GitHub CLI (optional)
+
+```powershell
+winget install GitHub.cli
+```
+
+Restart PowerShell, then run `gh auth login` and `gh repo create osrs-bronzeman-overlay --public --source=. --push`.
 
 ## Deploy to the web (GitHub Pages)
 
