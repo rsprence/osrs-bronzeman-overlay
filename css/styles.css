@@ -559,14 +559,6 @@ body {
   margin-right: 6px;
 }
 
-.unlock-celebration__tagline {
-  margin: 4px 0 0;
-  font-size: clamp(8px, 0.9vw, 12px);
-  color: #ff981f;
-  text-shadow: 1px 1px 0 #000;
-  letter-spacing: 1px;
-}
-
 /* Enter sequence */
 .unlock-celebration.is-active .unlock-celebration__backdrop {
   animation: unlock-fade-in 0.35s ease-out forwards;
