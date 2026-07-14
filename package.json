@@ -1,0 +1,9 @@
+{
+  "name": "osrs-bronzeman-overlay",
+  "private": true,
+  "version": "1.0.0",
+  "description": "OBS overlay for OSRS Bronzeman partner unlock tracking",
+  "scripts": {
+    "start": "npx --yes serve . -p 3000"
+  }
+}

@@ -1,0 +1,308 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+:root {
+  --osrs-bg-dark: #1a1208;
+  --osrs-bg-mid: #3d2817;
+  --osrs-bg-light: #5c4a32;
+  --osrs-bg-panel: #2b1f0e;
+  --osrs-border-dark: #1a0f06;
+  --osrs-border-light: #8b7355;
+  --osrs-border-highlight: #c4a574;
+  --osrs-text: #ffff00;
+  --osrs-text-white: #ffffff;
+  --osrs-text-orange: #ff981f;
+  --osrs-text-green: #00ff00;
+  --osrs-text-red: #ff0000;
+  --osrs-locked: #6b5a45;
+  --osrs-unlocked: #4a8f3a;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--osrs-text-white);
+  font-family: "Press Start 2P", "Courier New", monospace;
+  font-size: 10px;
+  line-height: 1.4;
+  -webkit-font-smoothing: none;
+  image-rendering: pixelated;
+  overflow: hidden;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* OSRS panel chrome */
+.osrs-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, transparent 40%),
+    linear-gradient(180deg, var(--osrs-bg-mid) 0%, var(--osrs-bg-panel) 100%);
+  border: 3px solid var(--osrs-border-dark);
+  outline: 2px solid var(--osrs-border-light);
+  outline-offset: -5px;
+  box-shadow:
+    inset 0 1px 0 var(--osrs-border-highlight),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.5),
+    0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.osrs-title {
+  text-align: center;
+  color: var(--osrs-text);
+  font-size: clamp(10px, 1.1vw, 16px);
+  text-shadow: 1px 1px 0 #000;
+  margin: 0 0 4px;
+  letter-spacing: 0.5px;
+}
+
+.osrs-subtitle {
+  text-align: center;
+  color: var(--osrs-text-orange);
+  font-size: clamp(6px, 0.55vw, 9px);
+  margin: 0 0 8px;
+  line-height: 1.5;
+}
+
+/* Summary bar */
+.summary-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.summary-stat {
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid var(--osrs-border-dark);
+  padding: 6px 4px;
+  text-align: center;
+}
+
+.summary-stat .label {
+  display: block;
+  color: var(--osrs-text-orange);
+  font-size: clamp(5px, 0.45vw, 7px);
+  margin-bottom: 4px;
+}
+
+.summary-stat .value {
+  display: block;
+  color: var(--osrs-text);
+  font-size: clamp(6px, 0.6vw, 10px);
+}
+
+.summary-stat .value.green {
+  color: var(--osrs-text-green);
+}
+
+.summary-stat .value.red {
+  color: var(--osrs-text-red);
+}
+
+/* Item grid — 8 cols x 3 rows for 22 items, no scroll */
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: clamp(4px, 0.5vw, 8px);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.item-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2px, 0.35vh, 5px);
+  padding: clamp(4px, 0.5vw, 8px) clamp(3px, 0.35vw, 6px);
+  background: rgba(0, 0, 0, 0.25);
+  border: 2px solid var(--osrs-border-dark);
+  text-align: center;
+  min-width: 0;
+  min-height: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.item-card.unlocked {
+  background: rgba(74, 143, 58, 0.15);
+  border-color: #2d5a24;
+}
+
+.item-card.locked {
+  opacity: 0.9;
+}
+
+.item-icon-wrap {
+  width: clamp(24px, 2.2vw, 36px);
+  height: clamp(24px, 2.2vw, 36px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--osrs-border-dark);
+  flex-shrink: 0;
+}
+
+.item-icon {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.item-card.locked .item-icon {
+  filter: grayscale(1) brightness(0.6);
+}
+
+.item-name {
+  font-size: clamp(4px, 0.42vw, 7px);
+  color: var(--osrs-text-white);
+  text-shadow: 1px 1px 0 #000;
+  line-height: 1.35;
+  width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.item-card.unlocked .item-name {
+  color: var(--osrs-text-green);
+}
+
+.item-cost {
+  font-size: clamp(5px, 0.5vw, 8px);
+  color: var(--osrs-text);
+  text-shadow: 1px 1px 0 #000;
+  white-space: nowrap;
+}
+
+.item-status {
+  font-size: clamp(4px, 0.38vw, 6px);
+  padding: 2px 4px;
+  border: 1px solid;
+  width: 100%;
+  max-width: 100%;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.item-status.locked {
+  color: #ccc;
+  border-color: var(--osrs-locked);
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.item-status.unlocked {
+  color: var(--osrs-text-green);
+  border-color: var(--osrs-unlocked);
+  background: rgba(74, 143, 58, 0.2);
+}
+
+/* Overlay — full 1920x1080 canvas */
+#overlay-view {
+  width: 100vw;
+  height: 100vh;
+  padding: 10px;
+}
+
+#overlay-view .osrs-panel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(10px, 1.2vw, 18px) clamp(12px, 1.4vw, 22px);
+  overflow: hidden;
+}
+
+/* Control layout — same grid, full page for consistency */
+#control-view {
+  width: 100vw;
+  height: 100vh;
+  padding: 10px;
+}
+
+#control-view .osrs-panel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(10px, 1.2vw, 18px) clamp(12px, 1.4vw, 22px);
+  overflow: hidden;
+}
+
+.control-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+.osrs-btn {
+  flex: 1;
+  font-family: inherit;
+  font-size: clamp(6px, 0.55vw, 8px);
+  padding: 8px 6px;
+  cursor: pointer;
+  color: var(--osrs-text-white);
+  background: linear-gradient(180deg, var(--osrs-bg-light) 0%, var(--osrs-bg-mid) 100%);
+  border: 2px solid var(--osrs-border-dark);
+  outline: 1px solid var(--osrs-border-light);
+  outline-offset: -3px;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.osrs-btn:hover {
+  color: var(--osrs-text-orange);
+}
+
+.osrs-btn.danger {
+  color: var(--osrs-text-red);
+}
+
+.control-card {
+  cursor: pointer;
+}
+
+.control-card:hover {
+  background: rgba(255, 152, 31, 0.12);
+  border-color: var(--osrs-text-orange);
+}
+
+.control-card:focus-visible {
+  outline: 2px solid var(--osrs-text-orange);
+  outline-offset: -2px;
+}
+
+.control-hint {
+  font-size: clamp(5px, 0.45vw, 7px);
+  color: var(--osrs-text-orange);
+  text-align: center;
+  margin-top: 8px;
+  line-height: 1.8;
+  flex-shrink: 0;
+}
+
+/* GP coin decoration */
+.gp-coin {
+  display: inline-block;
+  width: clamp(6px, 0.55vw, 10px);
+  height: clamp(6px, 0.55vw, 10px);
+  background: radial-gradient(circle at 35% 35%, #ffe566, #c9a000 60%, #8b6914);
+  border-radius: 50%;
+  border: 1px solid #5c4a00;
+  vertical-align: middle;
+  margin-right: 2px;
+  box-shadow: inset -1px -1px 0 rgba(0, 0, 0, 0.3);
+}

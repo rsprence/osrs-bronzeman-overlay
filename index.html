@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, initial-scale=1.0" />
+    <title>OSRS Bronzeman Unlock Tracker</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <!-- OBS Browser Source: index.html?view=overlay -->
+    <div id="overlay-view" class="hidden">
+      <div class="osrs-panel">
+        <h1 class="osrs-title">Bronzeman Unlocks</h1>
+
+        <div class="summary-bar" id="overlay-summary"></div>
+        <div class="item-grid overlay-grid" id="overlay-grid"></div>
+      </div>
+    </div>
+
+    <!-- Streamer control: index.html?view=control -->
+    <div id="control-view" class="hidden">
+      <div class="osrs-panel">
+        <h1 class="osrs-title">Unlock Control</h1>
+        <p class="osrs-subtitle">Click a row to toggle locked / unlocked</p>
+
+        <div class="summary-bar" id="control-summary"></div>
+
+        <div class="control-actions">
+          <button type="button" class="osrs-btn" id="btn-lock-all">Lock All</button>
+          <button type="button" class="osrs-btn danger" id="btn-reset">Reset All</button>
+        </div>
+
+        <div class="item-grid control-grid" id="control-grid"></div>
+
+        <p class="control-hint">
+          Overlay URL: <strong>index.html?view=overlay</strong><br />
+          Run a local server so OBS and this page share state.
+        </p>
+      </div>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
