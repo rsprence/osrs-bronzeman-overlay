@@ -1,14 +1,26 @@
 import { ITEMS, STORAGE_KEY, CELEBRATION_KEY } from "../data/items.js";
 
+export const CHANNEL_NAME = "osrs-bronzeman";
+
+let channel = null;
+try {
+  channel = new BroadcastChannel(CHANNEL_NAME);
+} catch {
+  channel = null;
+}
+
 function defaultState() {
   return Object.fromEntries(ITEMS.map((item) => [item.id, false]));
 }
 
 export function publishCelebration(itemId) {
-  localStorage.setItem(
-    CELEBRATION_KEY,
-    JSON.stringify({ id: itemId, at: Date.now() })
-  );
+  const payload = { id: itemId, at: Date.now() };
+  localStorage.setItem(CELEBRATION_KEY, JSON.stringify(payload));
+  try {
+    channel?.postMessage({ type: "celebration", ...payload });
+  } catch {
+    // ignore
+  }
 }
 
 export function readCelebration() {

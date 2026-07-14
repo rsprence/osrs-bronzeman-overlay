@@ -308,7 +308,18 @@ body {
   box-shadow: inset -1px -1px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* ── Unlock celebration takeover ─────────────────────────────────────── */
+/* ── Unlock celebration takeover (separate OBS source) ─────────────── */
+#celebration-view {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
 .unlock-celebration {
   position: absolute;
   inset: 0;
@@ -658,15 +669,5 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* Dim the board slightly while celebration is up */
-#overlay-view:has(.unlock-celebration.is-active) .osrs-panel {
-  filter: brightness(0.45) saturate(0.7);
-  transition: filter 0.35s ease;
-}
-
-#overlay-view .osrs-panel {
-  transition: filter 0.85s ease;
 }
 

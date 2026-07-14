@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
-    <!-- OBS Browser Source: index.html?view=overlay -->
+    <!-- OBS Browser Source: progress board -->
     <div id="overlay-view" class="hidden">
       <div class="osrs-panel">
         <h1 class="osrs-title">Bronzeman Unlocks</h1>
@@ -15,8 +15,10 @@
         <div class="summary-bar" id="overlay-summary"></div>
         <div class="item-grid overlay-grid" id="overlay-grid"></div>
       </div>
+    </div>
 
-      <!-- Full-screen unlock takeover for viewers -->
+    <!-- OBS Browser Source: unlock celebration only (transparent until unlock) -->
+    <div id="celebration-view" class="hidden">
       <div id="unlock-celebration" class="unlock-celebration hidden" aria-hidden="true">
         <div class="unlock-celebration__backdrop"></div>
         <div class="unlock-celebration__vignette"></div>
@@ -53,8 +55,9 @@
         <div class="item-grid control-grid" id="control-grid"></div>
 
         <p class="control-hint">
-          Overlay URL: <strong>index.html?view=overlay</strong><br />
-          Run a local server so OBS and this page share state.
+          Progress overlay: <strong>/?view=overlay</strong><br />
+          Celebration overlay: <strong>/?view=celebration</strong><br />
+          Control + both OBS sources must share the same origin (same server URL).
         </p>
       </div>
     </div>
