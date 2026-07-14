@@ -1,7 +1,28 @@
-import { ITEMS, STORAGE_KEY } from "../data/items.js";
+import { ITEMS, STORAGE_KEY, CELEBRATION_KEY } from "../data/items.js";
 
 function defaultState() {
   return Object.fromEntries(ITEMS.map((item) => [item.id, false]));
+}
+
+export function publishCelebration(itemId) {
+  localStorage.setItem(
+    CELEBRATION_KEY,
+    JSON.stringify({ id: itemId, at: Date.now() })
+  );
+}
+
+export function readCelebration() {
+  try {
+    const raw = localStorage.getItem(CELEBRATION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed.id !== "string" || typeof parsed.at !== "number") {
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
 export function loadUnlocks() {
@@ -27,8 +48,10 @@ export function saveUnlocks(unlocks) {
 
 export function toggleUnlock(id) {
   const unlocks = loadUnlocks();
-  unlocks[id] = !unlocks[id];
+  const nowUnlocked = !unlocks[id];
+  unlocks[id] = nowUnlocked;
   saveUnlocks(unlocks);
+  if (nowUnlocked) publishCelebration(id);
   return unlocks;
 }
 

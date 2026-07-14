@@ -31,6 +31,7 @@ OBS browser overlay for **Bronzeman mode** partner unlock tracking. Shows item s
    - Background: transparent (default)
 
 4. **Toggle unlocks** on the control page while you play. The overlay updates automatically.
+   When you unlock an item, the overlay plays a full-screen celebration (item hero, flash, particles) for viewers, then returns to the board.
 
 ## Unlock rules
 

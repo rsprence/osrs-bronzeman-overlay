@@ -1,6 +1,14 @@
 import { ITEMS } from "../data/items.js";
 import { formatGp, wikiThumb } from "./format.js";
-import { loadUnlocks, saveUnlocks, toggleUnlock, resetUnlocks, summarize } from "./storage.js";
+import {
+  loadUnlocks,
+  saveUnlocks,
+  toggleUnlock,
+  resetUnlocks,
+  summarize,
+  readCelebration,
+} from "./storage.js";
+import { createCelebrationController } from "./celebration.js";
 
 const view = new URLSearchParams(window.location.search).get("view") || "overlay";
 const isControl = view === "control";
@@ -13,8 +21,11 @@ const overlaySummary = document.getElementById("overlay-summary");
 const controlSummary = document.getElementById("control-summary");
 
 const cardById = new Map();
+const itemById = new Map(ITEMS.map((item) => [item.id, item]));
 let lastUnlocksJson = "";
 let lastStatsKey = "";
+let lastCelebrationAt = 0;
+let celebration = null;
 
 const FALLBACK_ICON = `data:image/svg+xml,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><rect fill="#2b1f0e" width="28" height="28"/><text x="14" y="18" fill="#ff981f" font-size="14" text-anchor="middle" font-family="monospace">?</text></svg>'
@@ -112,6 +123,16 @@ function buildGrid(container, interactive) {
   }
 }
 
+function maybeCelebrate() {
+  if (!celebration) return;
+  const event = readCelebration();
+  if (!event || event.at <= lastCelebrationAt) return;
+  const item = itemById.get(event.id);
+  if (!item) return;
+  lastCelebrationAt = event.at;
+  celebration.play(item);
+}
+
 function syncFromStorage() {
   const unlocks = loadUnlocks();
   const unlocksJson = JSON.stringify(unlocks);
@@ -130,6 +151,8 @@ function syncFromStorage() {
     renderSummary(summaryEl, stats);
     lastStatsKey = statsKey;
   }
+
+  if (!isControl) maybeCelebrate();
 }
 
 function init() {
@@ -150,6 +173,12 @@ function init() {
     });
   } else {
     overlayView.classList.remove("hidden");
+    celebration = createCelebrationController(
+      document.getElementById("unlock-celebration")
+    );
+    // Ignore any leftover celebration event from a previous session.
+    const existing = readCelebration();
+    if (existing) lastCelebrationAt = existing.at;
   }
 
   buildGrid(grid, isControl);
@@ -157,10 +186,13 @@ function init() {
 
   window.addEventListener("storage", (e) => {
     if (e.key?.includes("osrs-bronzeman-unlocks")) syncFromStorage();
+    if (e.key?.includes("osrs-bronzeman-celebration") && !isControl) {
+      maybeCelebrate();
+    }
   });
 
   // Poll for OBS browser-source sync; only updates DOM when state actually changes.
-  setInterval(syncFromStorage, 2000);
+  setInterval(syncFromStorage, isControl ? 2000 : 500);
 }
 
 init();

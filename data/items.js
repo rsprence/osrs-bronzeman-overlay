@@ -24,3 +24,4 @@ export const ITEMS = [
 ];
 
 export const STORAGE_KEY = "osrs-bronzeman-unlocks-v1";
+export const CELEBRATION_KEY = "osrs-bronzeman-celebration-v1";
