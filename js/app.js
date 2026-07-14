@@ -8,8 +8,12 @@ import {
   summarize,
   readCelebration,
   CHANNEL_NAME,
+  setSyncRoom,
+  applyRemoteUnlocks,
+  getSenderId,
 } from "./storage.js";
 import { createCelebrationController } from "./celebration.js";
+import { resolveRoom, urlsForRoom, subscribeRemote } from "./sync.js";
 
 const view = new URLSearchParams(window.location.search).get("view") || "overlay";
 const isControl = view === "control";
@@ -31,6 +35,7 @@ let lastCelebrationAt = 0;
 let prevUnlocks = null;
 let celebration = null;
 let channel = null;
+let room = null;
 
 const FALLBACK_ICON = `data:image/svg+xml,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><rect fill="#2b1f0e" width="28" height="28"/><text x="14" y="18" fill="#ff981f" font-size="14" text-anchor="middle" font-family="monospace">?</text></svg>'
@@ -93,13 +98,13 @@ function createItemCard(item, { interactive }) {
   if (interactive) {
     card.addEventListener("click", () => {
       toggleUnlock(item.id);
-      syncFromStorage();
+      syncBoardFromStorage();
     });
     card.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         toggleUnlock(item.id);
-        syncFromStorage();
+        syncBoardFromStorage();
       }
     });
   }
@@ -184,12 +189,66 @@ function syncCelebrationFromStorage() {
   maybeCelebrateFromStorage();
 }
 
-function syncFromStorage() {
-  if (isCelebration) {
-    syncCelebrationFromStorage();
-    return;
+function handleRemoteEvent(payload) {
+  if (payload.sender && payload.sender === getSenderId()) return;
+
+  if (payload.unlocks) {
+    applyRemoteUnlocks(payload.unlocks);
+    if (!isCelebration) syncBoardFromStorage();
+    if (isCelebration) prevUnlocks = { ...payload.unlocks };
   }
-  syncBoardFromStorage();
+
+  if (payload.type === "celebration" && payload.id) {
+    // Persist so local poll paths also see it.
+    localStorage.setItem(
+      CELEBRATION_KEY,
+      JSON.stringify({ id: payload.id, at: payload.at || Date.now() })
+    );
+    if (isCelebration) {
+      triggerCelebration(payload.id, payload.at || Date.now());
+    }
+  } else if (isCelebration) {
+    syncCelebrationFromStorage();
+  }
+}
+
+function renderRoomPanel(roomId) {
+  const panel = document.getElementById("room-panel");
+  if (!panel || !roomId) return;
+  const urls = urlsForRoom(roomId);
+  panel.classList.remove("hidden");
+  panel.innerHTML = `
+    <p class="room-panel__title">OBS sync room</p>
+    <p class="room-panel__why">
+      Chrome and OBS do <strong>not</strong> share localStorage. This room bridges them.
+      Paste these exact URLs into your OBS browser sources:
+    </p>
+    <label class="room-panel__label">Progress overlay</label>
+    <input class="room-panel__url" id="url-progress" readonly value="${urls.progress}" />
+    <label class="room-panel__label">Celebration overlay</label>
+    <input class="room-panel__url" id="url-celebration" readonly value="${urls.celebration}" />
+    <p class="room-panel__room">Room code: <code>${roomId}</code></p>
+  `;
+  for (const id of ["url-progress", "url-celebration"]) {
+    panel.querySelector(`#${id}`)?.addEventListener("click", (e) => {
+      e.target.select();
+      navigator.clipboard?.writeText(e.target.value);
+    });
+  }
+}
+
+function ensureRoomInUrl(roomId) {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("room") === roomId) return;
+  params.set("view", view);
+  params.set("room", roomId);
+  history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+}
+
+function initRemoteSync() {
+  setSyncRoom(room);
+  if (!room) return;
+  subscribeRemote(room, handleRemoteEvent);
 }
 
 function initCelebrationView() {
@@ -198,7 +257,9 @@ function initCelebrationView() {
     document.getElementById("unlock-celebration")
   );
 
-  // Ignore leftover events from earlier sessions on load.
+  room = resolveRoom({ createIfMissing: false });
+  initRemoteSync();
+
   const existing = readCelebration();
   if (existing) lastCelebrationAt = existing.at;
   prevUnlocks = loadUnlocks();
@@ -220,8 +281,13 @@ function initCelebrationView() {
     channel = null;
   }
 
-  // OBS CEF often misses storage events — poll aggressively.
   setInterval(syncCelebrationFromStorage, 250);
+
+  if (!room) {
+    console.warn(
+      "[bronzeman] No ?room= on celebration URL. OBS will not receive unlocks from Chrome control."
+    );
+  }
 }
 
 function initBoardView() {
@@ -229,29 +295,41 @@ function initBoardView() {
 
   if (isControl) {
     controlView.classList.remove("hidden");
+    room = resolveRoom({ createIfMissing: true });
+    ensureRoomInUrl(room);
+    renderRoomPanel(room);
+    initRemoteSync();
+
     document.getElementById("btn-reset").addEventListener("click", () => {
       if (confirm("Reset all unlocks to LOCKED?")) {
         resetUnlocks();
-        syncFromStorage();
+        syncBoardFromStorage();
       }
     });
     document.getElementById("btn-lock-all").addEventListener("click", () => {
       const state = Object.fromEntries(ITEMS.map((item) => [item.id, false]));
       saveUnlocks(state);
-      syncFromStorage();
+      syncBoardFromStorage();
     });
   } else {
     overlayView.classList.remove("hidden");
+    room = resolveRoom({ createIfMissing: false });
+    initRemoteSync();
+    if (!room) {
+      console.warn(
+        "[bronzeman] No ?room= on overlay URL. OBS will not receive unlocks from Chrome control."
+      );
+    }
   }
 
   buildGrid(grid, isControl);
-  syncFromStorage();
+  syncBoardFromStorage();
 
   window.addEventListener("storage", (e) => {
-    if (e.key?.includes("osrs-bronzeman-unlocks")) syncFromStorage();
+    if (e.key?.includes("osrs-bronzeman-unlocks")) syncBoardFromStorage();
   });
 
-  setInterval(syncFromStorage, 2000);
+  setInterval(syncBoardFromStorage, 2000);
 }
 
 function init() {

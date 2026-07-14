@@ -295,6 +295,59 @@ body {
   flex-shrink: 0;
 }
 
+.room-panel {
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 2px solid var(--osrs-border-dark);
+  flex-shrink: 0;
+}
+
+.room-panel__title {
+  margin: 0 0 6px;
+  color: var(--osrs-text);
+  font-size: clamp(7px, 0.7vw, 10px);
+  text-align: center;
+}
+
+.room-panel__why {
+  margin: 0 0 8px;
+  color: var(--osrs-text-orange);
+  font-size: clamp(5px, 0.45vw, 7px);
+  line-height: 1.7;
+  text-align: left;
+}
+
+.room-panel__label {
+  display: block;
+  margin: 6px 0 3px;
+  color: var(--osrs-text-white);
+  font-size: clamp(5px, 0.42vw, 7px);
+}
+
+.room-panel__url {
+  width: 100%;
+  font-family: inherit;
+  font-size: clamp(5px, 0.42vw, 7px);
+  padding: 6px;
+  color: var(--osrs-text);
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--osrs-border-light);
+  cursor: pointer;
+}
+
+.room-panel__room {
+  margin: 8px 0 0;
+  text-align: center;
+  color: var(--osrs-text-green);
+  font-size: clamp(5px, 0.45vw, 7px);
+}
+
+.room-panel__room code {
+  color: var(--osrs-text);
+}
+
+
 /* GP coin decoration */
 .gp-coin {
   display: inline-block;
