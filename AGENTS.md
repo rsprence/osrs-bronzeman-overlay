@@ -16,6 +16,5 @@ Static OBS browser overlay — no build step required.
 Push to `main`. The `.github/workflows/pages.yml` workflow publishes the repo root automatically.
 
 Live URLs after deploy:
-- Progress: `https://<user>.github.io/<repo>/?view=overlay`
-- Celebration: `https://<user>.github.io/<repo>/?view=celebration`
-- Control: `https://<user>.github.io/<repo>/?view=control`
+- Control (creates sync room): `https://<user>.github.io/<repo>/?view=control`
+- Progress / celebration: use the room URLs shown on the control page (`&room=...` required for OBS)

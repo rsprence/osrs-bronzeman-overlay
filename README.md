@@ -4,34 +4,31 @@ OBS browser overlay for **Bronzeman mode** partner unlock tracking. Shows item s
 
 ## Quick setup
 
-1. **Start a local server** (required so OBS and the control panel share unlock state):
+### Why Chrome control alone won’t drive OBS
 
-   ```powershell
-   cd C:\Users\Prence\Projects\osrs-bronzeman-overlay
-   npm start
-   ```
+OBS Browser Source is a **separate Chromium** with its own `localStorage`. Unlocking in Chrome does not update OBS unless you share a **sync room** (built in) or open control inside OBS itself.
 
-   Or with Python:
+### Recommended: GitHub Pages + sync room
 
-   ```powershell
-   python -m http.server 8080
-   ```
+1. Open the **control** page in Chrome:
+   `https://rsprence.github.io/osrs-bronzeman-overlay/?view=control`
+2. Copy the **Progress** and **Celebration** URLs from the “OBS sync room” panel (they include `&room=...`).
+3. In OBS, add two Browser Sources (1920×1080, transparent):
 
-2. **Add OBS Browser Sources:**
+   | Source | URL |
+   |--------|-----|
+   | Progress overlay | paste Progress URL from control |
+   | Celebration overlay | paste Celebration URL from control (above game capture) |
 
-   | Source | URL | Notes |
-   |--------|-----|-------|
-   | Progress overlay | `http://localhost:3000/?view=overlay` | Unlock board HUD |
-   | Celebration overlay | `http://localhost:3000/?view=celebration` | Transparent until unlock; full-screen takeover |
-   | Control (off-stream) | `http://localhost:3000/?view=control` | Toggle unlocks |
+4. Unlock items on the control page — celebration should fire in OBS.
 
-   Adjust port if using Python (`8080`). Put the celebration source **above** the game capture so it can cover the whole canvas.
+### Local server (optional)
 
-3. **OBS settings for both overlay sources:**
-   - Width: **1920**, Height: **1080** (full canvas)
-   - Background: transparent (default)
+```powershell
+npm start
+```
 
-4. **Toggle unlocks** on the control page while you play. The progress overlay updates automatically. Unlocking an item fires the celebration overlay (hero item, flash, particles), then it goes transparent again.
+Then open `http://localhost:3000/?view=control` and use the room URLs it prints (same idea as above).
 
 ## Unlock rules
 
@@ -83,8 +80,7 @@ Edit `data/items.js` to change names, costs, or wiki image names. Item sprites l
 After pushing to GitHub, enable **Pages** under repo Settings → Pages → Source: **GitHub Actions**.
 
 Your live URLs will be:
-- Progress: `https://<username>.github.io/osrs-bronzeman-overlay/?view=overlay`
-- Celebration: `https://<username>.github.io/osrs-bronzeman-overlay/?view=celebration`
 - Control: `https://<username>.github.io/osrs-bronzeman-overlay/?view=control`
+- Progress / Celebration: copy from the control page room panel (must include `&room=...`)
 
-Use these in OBS instead of `localhost` — no local server needed. Put celebration above game capture.
+Chrome and OBS do not share localStorage — the room parameter is required for OBS overlays.
