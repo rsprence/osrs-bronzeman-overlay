@@ -218,6 +218,50 @@ body {
   padding: 10px;
 }
 
+/* Larger readable type for the on-stream progress board */
+#overlay-view .osrs-title {
+  font-size: clamp(14px, 1.7vw, 26px);
+  margin-bottom: 8px;
+}
+
+#overlay-view .summary-stat {
+  padding: 8px 6px;
+}
+
+#overlay-view .summary-stat .label {
+  font-size: clamp(8px, 0.75vw, 13px);
+  margin-bottom: 6px;
+}
+
+#overlay-view .summary-stat .value {
+  font-size: clamp(11px, 1.05vw, 18px);
+}
+
+#overlay-view .item-icon-wrap {
+  width: clamp(32px, 3vw, 48px);
+  height: clamp(32px, 3vw, 48px);
+}
+
+#overlay-view .item-name {
+  font-size: clamp(7px, 0.72vw, 12px);
+  line-height: 1.4;
+}
+
+#overlay-view .item-cost {
+  font-size: clamp(8px, 0.85vw, 14px);
+}
+
+#overlay-view .item-status {
+  font-size: clamp(7px, 0.7vw, 12px);
+  padding: 3px 5px;
+}
+
+#overlay-view .gp-coin {
+  width: clamp(9px, 0.85vw, 14px);
+  height: clamp(9px, 0.85vw, 14px);
+  margin-right: 4px;
+}
+
 #overlay-view .osrs-panel {
   width: 100%;
   height: 100%;
@@ -526,7 +570,7 @@ body {
 
 .unlock-celebration__banner {
   margin: 0;
-  font-size: clamp(18px, 3.2vw, 42px);
+  font-size: clamp(24px, 4.2vw, 56px);
   color: #ffff00;
   text-shadow:
     3px 3px 0 #000,
@@ -540,7 +584,7 @@ body {
 .unlock-celebration__name {
   margin: 0;
   max-width: 90vw;
-  font-size: clamp(14px, 2.4vw, 32px);
+  font-size: clamp(18px, 3vw, 42px);
   line-height: 1.35;
   color: #ffffff;
   text-shadow: 2px 2px 0 #000, 0 0 18px rgba(0, 255, 0, 0.35);
@@ -548,7 +592,7 @@ body {
 
 .unlock-celebration__cost {
   margin: 0;
-  font-size: clamp(12px, 1.6vw, 22px);
+  font-size: clamp(16px, 2.2vw, 30px);
   color: #ffff00;
   text-shadow: 2px 2px 0 #000;
 }
